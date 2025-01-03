@@ -1,0 +1,22 @@
+{
+  "CourseCode": "CPE103",
+  "CourseName": "Introduction to Computer Engineering",
+  "Semester": "1/2025",
+  "Credits": 3,
+  "Score": [
+    {
+      "Student": {
+        "StudentID": "B6419947",
+        "StudentName": "John Doe"
+      },
+      "Point": 90
+    },
+    {
+      "Student": {
+        "StudentID": "B6419958",
+        "StudentName": "Jane Smith"
+      },
+      "Point": 78
+    }
+  ]
+}

@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/Risotto04/blockchain/models"
 )
 
 type Block struct {
 	Timestamp     time.Time
-	Data          Transcript
+	Data          []*models.Course
 	PrevBlockHash []byte
 	Hash          []byte
 	MerkleRoot    []byte
@@ -20,39 +22,20 @@ type Blockchain struct {
 	Blocks []*Block
 }
 
-type Transcript struct {
-	StudentID   string
-	StudentName string
-	Faculty     string
-	Major       string
-	University  string
-	Courses     []Course
-	Gpa         float64
-	IssueDate   time.Time
-}
-
-type Course struct {
-	CourseCode string
-	CourseName string
-	Semester   string
-	Credits    int
-	Grade      string
-}
-
-func hashCourse(course Course) []byte {
+func hashCourse(course models.Course) []byte {
 	courseBytes, _ := json.Marshal(course)
 	hash := sha256.Sum256(courseBytes)
 	return hash[:]
 }
 
-func computeMerkleRoot(courses []Course) []byte {
+func computeMerkleRoot(courses []*models.Course) []byte {
 	if len(courses) == 0 {
 		return []byte{}
 	}
 
 	var hashes [][]byte
 	for _, course := range courses {
-		hashes = append(hashes, hashCourse(course))
+		hashes = append(hashes, hashCourse(*course))
 	}
 
 	for len(hashes) > 1 {
@@ -85,8 +68,8 @@ func (b *Block) SetHash() {
 	b.Hash = hash[:]
 }
 
-func NewBlock(data Transcript, prevBlockHash []byte) *Block {
-	merkleRoot := computeMerkleRoot(data.Courses)
+func NewBlock(data []*models.Course, prevBlockHash []byte) *Block {
+	merkleRoot := computeMerkleRoot(data)
 
 	block := &Block{
 		Timestamp:     time.Now(),
@@ -99,23 +82,23 @@ func NewBlock(data Transcript, prevBlockHash []byte) *Block {
 	return block
 }
 
-func (bc *Blockchain) AddBlock(data Transcript) {
+func (bc *Blockchain) AddBlock(data []*models.Course) {
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
 	newBlock := NewBlock(data, prevBlock.Hash)
 	bc.Blocks = append(bc.Blocks, newBlock)
 }
 
 func NewGenesisBlock() *Block {
-	genesisTranscript := Transcript{
-		StudentID:   "B6499999",
-		StudentName: "Genesis",
-		Faculty:     "None",
-		Major:       "None",
-		University:  "Blockchain University",
-		Courses:     []Course{},
-		Gpa:         0.0,
-		IssueDate:   time.Now(),
-	}
+	genesisTranscript := []*models.Course{
+		{
+			CourseCode: "Genesis",
+			CourseName: "Blockchain",
+			Semester:   "2024/1",
+			Credits:    4,
+			Score: []models.Score{
+				{Student: models.Student{StudentID: "G6410000", StudentName: "Genesis"}, Point: 0},
+			},
+		}}
 	return NewBlock(genesisTranscript, []byte{})
 }
 
@@ -137,7 +120,7 @@ func (bc *Blockchain) Validate() error {
 }
 
 func ValidateBlock(block *Block) error {
-	expectedMerkleRoot := computeMerkleRoot(block.Data.Courses)
+	expectedMerkleRoot := computeMerkleRoot(block.Data)
 	if !bytes.Equal(block.MerkleRoot, expectedMerkleRoot) {
 		return fmt.Errorf("invalid Merkle Root")
 	}
@@ -155,7 +138,9 @@ func (bc *Blockchain) GetBlock(index int) *Block {
 	}
 	return bc.Blocks[index]
 }
-
+func (bc *Blockchain) GetBlocks() []*Block {
+	return bc.Blocks
+}
 func calculateBlockHash(block *Block) []byte {
 	dataBytes, _ := json.Marshal(block.Data)
 
