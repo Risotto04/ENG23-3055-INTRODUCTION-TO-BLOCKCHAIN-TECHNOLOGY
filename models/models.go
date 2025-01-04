@@ -16,3 +16,9 @@ type Course struct {
 	Credits    int
 	Score      []Score
 }
+
+type Node struct {
+	NodeID string
+	Port   string
+	Peers  []string
+}
