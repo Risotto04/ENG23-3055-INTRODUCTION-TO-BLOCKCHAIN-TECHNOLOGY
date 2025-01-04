@@ -8,7 +8,7 @@ import (
 
 type Consensus struct {
 	Approvals map[string]bool
-	Quorum    int
+	Quorum    int //จำนวนโหวตที่ยอมรับ
 }
 
 func selectValidator(blockHeight int, validators []string) string {
@@ -16,10 +16,12 @@ func selectValidator(blockHeight int, validators []string) string {
 	return validators[index]
 }
 
+// Validation
 func (c *Consensus) AddApproval(validator string) {
 	c.Approvals[validator] = true
 }
 
+// Check validate number
 func (c *Consensus) HasQuorum() bool {
 	count := 0
 	for _, approved := range c.Approvals {
@@ -30,6 +32,7 @@ func (c *Consensus) HasQuorum() bool {
 	return count >= c.Quorum
 }
 
+// Check validation and add block
 func finalizeBlock(block *blockchain.Block, c *Consensus, bc *blockchain.Blockchain) {
 	if c.HasQuorum() {
 		bc.AddBlock(block.Data)

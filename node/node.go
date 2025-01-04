@@ -7,13 +7,13 @@ import (
 	"net/http"
 
 	"github.com/Risotto04/blockchain/blockchain"
-	"github.com/Risotto04/blockchain/consensus"
 	"github.com/Risotto04/blockchain/controller"
 	"github.com/Risotto04/blockchain/models"
 	"github.com/gin-gonic/gin"
 )
 
-func initNodes() {
+// Run nodes
+func InitNodes() {
 	go startNode(models.Node{NodeID: "node1", Port: "8081", Peers: []string{"http://localhost:8082", "http://localhost:8083"}})
 	go startNode(models.Node{NodeID: "node2", Port: "8082", Peers: []string{"http://localhost:8081", "http://localhost:8083"}})
 	go startNode(models.Node{NodeID: "node3", Port: "8083", Peers: []string{"http://localhost:8081", "http://localhost:8082"}})
@@ -22,6 +22,7 @@ func initNodes() {
 	select {}
 }
 
+// Init node
 func startNode(config models.Node) {
 	bc := blockchain.NewBlockchain()
 
@@ -42,6 +43,7 @@ func startNode(config models.Node) {
 
 }
 
+// Broadcast block
 func broadcastBlock(block *blockchain.Block, peers []string) {
 	blockBytes, _ := json.Marshal(block)
 	for _, peer := range peers {
@@ -55,6 +57,7 @@ func broadcastBlock(block *blockchain.Block, peers []string) {
 	}
 }
 
+// Handle incoming block
 func handleBlockProposal(w http.ResponseWriter, r *http.Request) {
 	var block blockchain.Block
 	err := json.NewDecoder(r.Body).Decode(&block)
@@ -70,6 +73,7 @@ func handleBlockProposal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add approval and check consensus
+	//แดงๆ งงๆ
 	consensus
 	if consensus.hasQuorum() {
 		finalizeBlock(&block, consensus, blockchain)
