@@ -19,7 +19,8 @@ func NewConsensus(quorum int) *Consensus {
 	}
 }
 
-func selectValidator(blockHeight int, validators []string) string {
+//Round-Robin
+func SelectValidator(blockHeight int, validators []string) string {
 	index := blockHeight % len(validators)
 	return validators[index]
 }
@@ -36,6 +37,7 @@ func (c *Consensus) HasQuorum() bool {
 		if approved {
 			count++
 		}
+		fmt.Println(count)
 	}
 	return count >= c.Quorum
 }

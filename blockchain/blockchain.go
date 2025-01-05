@@ -86,6 +86,7 @@ func (bc *Blockchain) AddBlock(data []*models.Course) {
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
 	newBlock := NewBlock(data, prevBlock.Hash)
 	bc.Blocks = append(bc.Blocks, newBlock)
+	fmt.Println(bc.Blocks)
 }
 
 func NewGenesisBlock() *Block {
